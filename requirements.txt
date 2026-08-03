@@ -1,0 +1,4 @@
+requests>=2.28
+numpy>=1.24      # optional: faster similarity search, pure-python fallback exists
+pypdf>=4.0       # optional: .pdf ingestion
+python-docx>=1.1 # optional: .docx ingesti
