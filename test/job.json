@@ -1,0 +1,35 @@
+{
+  "include": [
+    "sources/"
+  ],
+  "extensions": [
+    ".c"
+  ],
+  "exclude": [
+    ".git",
+    "__pycache__",
+    "node_modules",
+    "vendor",
+    "dist",
+    "build",
+    ".venv",
+    "venv",
+    ".tox",
+    ".mypy_cache",
+    ".pytest_cache"
+  ],
+  "min_lines": 4,
+  "window_lines": 40,
+  "window_overlap": 8,
+  "threshold": 0.7,
+  "report": "pairwise",
+  "top_n": null,
+  "cache": true,
+  "cache_file": null,
+  "output": "markdown",
+  "output_file": "duplicate_report.md",
+  "min_structure": 0.5,
+  "filter_callers": true,
+  "idf_weighting": true,
+  "min_distinct": 0.1
+}

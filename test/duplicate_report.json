@@ -1,0 +1,104 @@
+{
+  "elapsed": {
+    "total_seconds": 0.004,
+    "embed_seconds": 0.0,
+    "compare_seconds": 0.001
+  },
+  "pairs": [
+    {
+      "similarity": 0.8844,
+      "structural": 1.0,
+      "distinctiveness": null,
+      "a": {
+        "path": "sources/TestCase1.c",
+        "start": 1,
+        "end": 4,
+        "name": "add",
+        "kind": "function"
+      },
+      "b": {
+        "path": "sources/TestCase1.c",
+        "start": 6,
+        "end": 9,
+        "name": "disguised_add",
+        "kind": "function"
+      }
+    },
+    {
+      "similarity": 0.7577,
+      "structural": 0.9366,
+      "distinctiveness": null,
+      "a": {
+        "path": "sources/TestCase3.c",
+        "start": 6,
+        "end": 22,
+        "name": "bubble_sort",
+        "kind": "function"
+      },
+      "b": {
+        "path": "sources/TestCase4.c",
+        "start": 4,
+        "end": 20,
+        "name": "sort_ascending",
+        "kind": "function"
+      }
+    },
+    {
+      "similarity": 0.7537,
+      "structural": 0.8824,
+      "distinctiveness": null,
+      "a": {
+        "path": "sources/TestCase2.c",
+        "start": 10,
+        "end": 17,
+        "name": "is_positive",
+        "kind": "function"
+      },
+      "b": {
+        "path": "sources/TestCase5.c",
+        "start": 5,
+        "end": 12,
+        "name": "validate_total",
+        "kind": "function"
+      }
+    },
+    {
+      "similarity": 0.7199,
+      "structural": 0.6562,
+      "distinctiveness": null,
+      "a": {
+        "path": "sources/TestCase1.c",
+        "start": 1,
+        "end": 4,
+        "name": "add",
+        "kind": "function"
+      },
+      "b": {
+        "path": "sources/TestCase2.c",
+        "start": 4,
+        "end": 8,
+        "name": "compute_sum",
+        "kind": "function"
+      }
+    },
+    {
+      "similarity": 0.7099,
+      "structural": 0.5094,
+      "distinctiveness": null,
+      "a": {
+        "path": "sources/TestCase2.c",
+        "start": 4,
+        "end": 8,
+        "name": "compute_sum",
+        "kind": "function"
+      },
+      "b": {
+        "path": "sources/TestCase5.c",
+        "start": 14,
+        "end": 24,
+        "name": "process_order",
+        "kind": "function"
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llmcli"
+version = "2.0.0"
+description = "Chat, document RAG and duplicate-code detection against any OpenAI-compatible endpoint"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "requests>=2.28",
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+# document formats beyond plain text
+corpus = ["pypdf>=4.0", "python-docx>=1.1"]
+# real parsers for code extraction (100+ languages)
+dupcheck = ["tree-sitter-language-pack>=1.15"]
+all = ["pypdf>=4.0", "python-docx>=1.1", "tree-sitter-language-pack>=1.15"]
+
+[project.scripts]
+llmcli = "llmcli.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["llmcli*"]

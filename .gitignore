@@ -1,0 +1,6 @@
+.venv
+.llmcli/
+build/
+*.egg-info/
+__pycache__/
+*.dupcheck_cache.db

@@ -1,4 +1,12 @@
+# The package declares these in pyproject.toml; this file is for a plain
+#   pip install -r requirements.txt
+# against a checkout.
 requests>=2.28
-numpy>=1.24      # optional: faster similarity search, pure-python fallback exists
+numpy>=1.24      # brute-force scans are a matrix multiply with it, minutes without
+
+# llmcli[corpus] - document formats beyond plain text
 pypdf>=4.0       # optional: .pdf ingestion
-python-docx>=1.1 # optional: .docx ingesti
+python-docx>=1.1 # optional: .docx ingestion
+
+# llmcli[dupcheck] - real parsers for code extraction (100+ languages)
+tree-sitter-language-pack>=1.15
