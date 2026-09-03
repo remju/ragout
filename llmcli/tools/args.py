@@ -24,6 +24,8 @@ def common_parser() -> argparse.ArgumentParser:
                    default=None, help="skip TLS verification entirely")
     p.add_argument("--timeout", type=int, default=None,
                    help="per-request seconds before giving up; 0 = wait forever")
+    p.add_argument("--system-prompt", dest="system_prompt",
+                   help="default system prompt for chat/ask (normally set once in config.json)")
     p.add_argument("-w", "--workspace", metavar="DIR",
                    help="directory to resolve the workspace from (default: cwd)")
     p.add_argument("--no-inherit", action="store_true",

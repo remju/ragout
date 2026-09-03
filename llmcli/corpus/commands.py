@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 from llmcli.corpus.documents import chunk_text, iter_files, read_document
-from llmcli.corpus.rag import build_context, rag_messages, retrieve
+from llmcli.corpus.rag import RAG_SYSTEM, build_context, rag_messages, retrieve
 from llmcli.corpus.store import Store
 from llmcli.tools.args import Parents
 from llmcli.tools.client import LLMClient
@@ -72,7 +72,7 @@ def cmd_ask(args, cfg: Config) -> None:
     if args.show_context:
         print(context or "(no context)", "\n" + "=" * 60)
     client.chat(
-        rag_messages(args.question, context),
+        rag_messages(args.question, context, system=cfg.system_prompt or RAG_SYSTEM),
         stream=not args.no_stream,
         temperature=args.temperature,
     )

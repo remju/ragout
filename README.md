@@ -87,6 +87,7 @@ so you can never ingest into the wrong store by accident.
 | `verify_ssl` | `LLM_VERIFY_SSL` | `true` | `false` skips verification entirely |
 | `timeout` | `LLM_TIMEOUT` | `300` | seconds per request; `0` waits forever |
 | `embed_batch` | `LLM_EMBED_BATCH` | `64` | texts per embedding request |
+| `system_prompt` | `LLM_SYSTEM_PROMPT` | — | default system prompt for `chat` and `ask` |
 
 Resolution order: **CLI flags > env vars > nearest config > ... > farthest config**
 (plus `LLMCLI_WORKSPACE` to pick the starting directory). Config files are written
@@ -128,6 +129,11 @@ llmcli chat --rag                 # every turn is grounded on this project's doc
 ```
 
 In-REPL: `/rag on|off`, `/sources`, `/system TEXT`, `/reset`, `/save FILE`, `/help`, `/exit`.
+
+The system prompt used by `chat` and `ask` resolves as: `--system` (chat only, this
+turn) > `--system-prompt` (this invocation) > `system_prompt` in `config.json` >
+the built-in default (a plain assistant prompt for `chat`, a grounded-answer
+prompt for `chat --rag` and `ask`).
 
 ## Documents
 

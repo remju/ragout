@@ -32,7 +32,7 @@ def cmd_chat(args, cfg: Config) -> None:
     client = LLMClient(cfg)
     store = Store(cfg.db)
     use_rag = args.rag
-    system = args.system or (RAG_SYSTEM if use_rag else DEFAULT_SYSTEM)
+    system = args.system or cfg.system_prompt or (RAG_SYSTEM if use_rag else DEFAULT_SYSTEM)
     history: List[dict] = []
     last_hits: List[Tuple[float, str, str]] = []
 

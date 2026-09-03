@@ -31,8 +31,13 @@ def retrieve(client: LLMClient, store: Store, question: str, k: int, min_score: 
     return store.search(vec, k=k, min_score=min_score)
 
 
-def rag_messages(question: str, context: str, history: Optional[List[dict]] = None) -> List[dict]:
-    msgs = [{"role": "system", "content": RAG_SYSTEM}]
+def rag_messages(
+    question: str,
+    context: str,
+    history: Optional[List[dict]] = None,
+    system: str = RAG_SYSTEM,
+) -> List[dict]:
+    msgs = [{"role": "system", "content": system}]
     if history:
         msgs.extend(history)
     user = (

@@ -64,6 +64,7 @@ SETTINGS = (
     Setting("verify_ssl", "LLM_VERIFY_SSL", "bool", True),
     Setting("timeout", "LLM_TIMEOUT", "int", 300),
     Setting("embed_batch", "LLM_EMBED_BATCH", "int", 64),
+    Setting("system_prompt", "LLM_SYSTEM_PROMPT", "str", ""),
 )
 
 SYSTEM_CA_BUNDLES = (
@@ -140,6 +141,7 @@ class Config:
     verify_ssl: bool = True
     timeout: int = 300
     embed_batch: int = 64
+    system_prompt: str = ""
     ws: Optional[Workspace] = None
 
     FIELDS = tuple(s.name for s in SETTINGS)
