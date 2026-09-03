@@ -45,6 +45,7 @@ NAME_NODE_TYPES = {
 
 _PARSER_CACHE: Dict[str, object] = {}
 _PARSER_WARNED: set = set()
+_PACKAGE_WARNED = False
 
 DEFAULT_EXCLUDES = [
     ".git", "__pycache__", "node_modules", "vendor", "dist", "build",
@@ -163,6 +164,15 @@ def _get_parser(language: str):
 
 def _extract_tree_sitter(path: Path, source: bytes, min_lines: int) -> List[Tuple]:
     if get_parser is None or detect_language_from_path is None:
+        global _PACKAGE_WARNED
+        if not _PACKAGE_WARNED:
+            _PACKAGE_WARNED = True
+            print(
+                "tree-sitter-language-pack is not installed - every file falls back to "
+                "fixed-size line windows, so real functions won't be matched against each "
+                "other. Install it with: pip install 'llmcli[dupcheck]'",
+                file=sys.stderr,
+            )
         return []
     try:
         language = detect_language_from_path(str(path))
