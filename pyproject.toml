@@ -14,11 +14,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# document formats beyond plain text
-corpus = ["pypdf>=4.0", "python-docx>=1.1"]
+# document formats beyond plain text, and a real vector index for the store
+corpus = ["pypdf>=4.0", "python-docx>=1.1", "sqlite-vec>=0.1.0"]
 # real parsers for code extraction (100+ languages)
 dupcheck = ["tree-sitter-language-pack>=1.15"]
-all = ["pypdf>=4.0", "python-docx>=1.1", "tree-sitter-language-pack>=1.15"]
+all = ["pypdf>=4.0", "python-docx>=1.1", "sqlite-vec>=0.1.0", "tree-sitter-language-pack>=1.15"]
 
 [project.scripts]
 llmcli = "llmcli.cli:main"

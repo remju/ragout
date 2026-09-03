@@ -31,10 +31,11 @@ pip install .                 # or: pipx install .
 pip install '.[all]'          # + pdf/docx reading and tree-sitter parsers
 ```
 
-Extras are per module: `.[corpus]` pulls `pypdf` and `python-docx`, `.[dupcheck]`
-pulls `tree-sitter-language-pack`. `requests` and `numpy` are always installed -
-numpy is not optional in practice, because the duplicate scan is O(n²) and takes
-~49s for 1500 code units in pure python where numpy takes 0.22s.
+Extras are per module: `.[corpus]` pulls `pypdf`, `python-docx` and `sqlite-vec`,
+`.[dupcheck]` pulls `tree-sitter-language-pack`. `requests` and `numpy` are
+always installed - numpy is not optional in practice, because the duplicate
+scan is O(n²) and takes ~49s for 1500 code units in pure python where numpy
+takes 0.22s.
 
 On a Debian/Ubuntu system python you'll hit PEP 668, so use `pipx`, a venv, or
 `pip install --break-system-packages`.
@@ -87,6 +88,7 @@ so you can never ingest into the wrong store by accident.
 | `verify_ssl` | `LLM_VERIFY_SSL` | `true` | `false` skips verification entirely |
 | `timeout` | `LLM_TIMEOUT` | `300` | seconds per request; `0` waits forever |
 | `embed_batch` | `LLM_EMBED_BATCH` | `64` | texts per embedding request |
+| `dupcheck_max_memory_mb` | `LLM_DUPCHECK_MAX_MEMORY_MB` | `2048` | memory cap for `dupcheck`'s similarity matrix; `0` = unlimited |
 | `system_prompt` | `LLM_SYSTEM_PROMPT` | — | default system prompt for `chat` and `ask` |
 
 Resolution order: **CLI flags > env vars > nearest config > ... > farthest config**
@@ -146,14 +148,23 @@ llmcli forget notes/old                   # substring match on path
 
 - **Chunking** — paragraph-aware packing to ~1200 chars with 200-char overlap
   (`--chunk-size`, `--overlap`). Oversized paragraphs are hard-split.
-- **Storage** — SQLite in the nearest workspace. Chunks in one table, embeddings as
-  packed float32 blobs alongside them. Files are hashed, so re-running `ingest` only
-  re-embeds what changed (`--force` overrides).
-- **Retrieval** — vectors are L2-normalised at write time, so search is a dot product;
-  top-k chunks are packed into a 6000-char context budget with source labels, and the
-  model is told to cite filenames and to admit when the context doesn't cover the question.
-- **Scale** — brute-force scan, fine to roughly tens of thousands of chunks. Past that,
-  swap `Store.search` for FAISS or sqlite-vec; nothing else needs to change.
+- **Storage** — SQLite in the nearest workspace. When `sqlite-vec` is installed
+  (`.[corpus]`), vectors go in a `vec0` virtual table and KNN search runs in C over
+  the whole table; otherwise chunks fall back to a plain BLOB column scored by a
+  python loop. The mode is picked once, when a store is first created, from whether
+  the extension loaded at that moment - an existing `store.db` always keeps the
+  schema it was built with, so installing or removing `sqlite-vec` later never
+  changes behavior under an existing project. Files are hashed, so re-running
+  `ingest` only re-embeds what changed (`--force` overrides).
+- **Retrieval** — vectors are L2-normalised at write time, so search is a distance/dot
+  product comparison; top-k chunks are packed into a 6000-char context budget with
+  source labels, and the model is told to cite filenames and to admit when the
+  context doesn't cover the question.
+- **Scale** — both backends still scan the whole store per query (`vec0`'s default
+  index is exact brute-force in C, not ANN), so cost still grows with corpus size -
+  the `sqlite-vec` path just removes per-row unpacking and scoring in python, which
+  is most of the old cost. Fine to roughly tens of thousands of chunks either way.
+  Past that, a true ANN index is the next step (`vec0` doesn't ship one yet).
 
 Embeddings are only comparable within one model. If you change the embedding
 model — including inheriting a different one from a parent — re-run
@@ -232,11 +243,15 @@ See `llmcli dupcheck --help` for the full field list.
   config), so re-running after small edits only re-embeds what changed. Worth
   gitignoring, along with `.llmcli/`.
 - **Scale** — same brute-force pairwise scan as document retrieval. With numpy
-  it's a single matrix multiply (4000 units ≈ 1.3s); without it, the same run is
-  minutes. Fine to roughly tens of thousands of units either way; past that,
-  swap the scan for FAISS or sqlite-vec.
+  it's a matrix multiply (4000 units ≈ 1.3s); without it, the same run is minutes.
+  The similarity matrix is computed in row blocks sized to stay under
+  `dupcheck_max_memory_mb` (default 2048MB) rather than one `n × n` allocation, so
+  a run degrades to slower instead of exhausting memory once unit count gets large
+  - a full-size codebase stays within one block and sees no change. Fine to roughly
+  tens of thousands of units either way; past that, swap the scan for FAISS or
+  sqlite-vec.
 
-`dupcheck-notes.md` records how the defaults above were arrived at, with the
+[`design/dupcheck-notes.md`](design/dupcheck-notes.md) records how the defaults above were arrived at, with the
 measurements behind each one.
 
 ## Upgrading from the single-file scripts

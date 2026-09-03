@@ -114,6 +114,7 @@ def cmd_run(args, cfg: Config) -> None:
         units, vectors, job.threshold, progress=show_progress,
         min_structure=job.min_structure, filter_callers=job.filter_callers,
         idf_weighting=job.idf_weighting, min_distinct=job.min_distinct,
+        max_memory_mb=cfg.dupcheck_max_memory_mb,
     )
     timings.compare = time.monotonic() - mark
 

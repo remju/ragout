@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from llmcli.dupcheck.structure import build_idf, distinctiveness, structural_similarity
 from llmcli.dupcheck.units import CodeUnit
@@ -24,6 +24,17 @@ def _calls_each_other(a: CodeUnit, b: CodeUnit) -> bool:
     return bool(a.name and a.name in b.idents) or bool(b.name and b.name in a.idents)
 
 
+def _block_rows(n: int, max_memory_mb: Optional[int]) -> int:
+    """Rows of the n x n similarity matrix to compute per block, so no single
+    allocation exceeds max_memory_mb (0/None = unlimited, the old behavior:
+    one block covering the whole matrix)."""
+    if not max_memory_mb or n <= 0:
+        return n
+    budget = max_memory_mb * 1024 * 1024
+    bytes_per_row = max(n * 4, 1)  # one f4 row of an n-wide similarity block
+    return max(1, min(n, budget // bytes_per_row))
+
+
 def find_pairs(
     units: List[CodeUnit],
     vectors: List[Sequence[float]],
@@ -33,6 +44,7 @@ def find_pairs(
     filter_callers: bool = True,
     idf_weighting: bool = True,
     min_distinct: float = 0.10,
+    max_memory_mb: Optional[int] = None,
 ) -> List[Tuple[float, float, float, int, int]]:
     """Pairs above `threshold` that also survive the structural corroboration.
 
@@ -63,14 +75,17 @@ def find_pairs(
     with Progress("comparing", n, progress) as prog:
         if np is not None:
             matrix = np.asarray(vectors, dtype="f4")
-            sims = matrix @ matrix.T
-            for i in range(n):
-                row = sims[i]
-                for j in range(i + 1, n):
-                    s = float(row[j])
-                    if s >= threshold:
-                        keep(s, i, j)
-                prog.advance()
+            block = _block_rows(n, max_memory_mb)
+            for start in range(0, n, block):
+                end = min(start + block, n)
+                sims = matrix[start:end] @ matrix.T
+                for local_i, i in enumerate(range(start, end)):
+                    row = sims[local_i]
+                    for j in range(i + 1, n):
+                        s = float(row[j])
+                        if s >= threshold:
+                            keep(s, i, j)
+                    prog.advance()
         else:
             for i in range(n):
                 for j in range(i + 1, n):

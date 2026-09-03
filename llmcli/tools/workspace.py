@@ -64,6 +64,9 @@ SETTINGS = (
     Setting("verify_ssl", "LLM_VERIFY_SSL", "bool", True),
     Setting("timeout", "LLM_TIMEOUT", "int", 300),
     Setting("embed_batch", "LLM_EMBED_BATCH", "int", 64),
+    # caps the dense n x n similarity matrix dupcheck builds in memory, by
+    # computing it in row blocks instead of one allocation; 0 = unlimited
+    Setting("dupcheck_max_memory_mb", "LLM_DUPCHECK_MAX_MEMORY_MB", "int", 2048),
     Setting("system_prompt", "LLM_SYSTEM_PROMPT", "str", ""),
 )
 
@@ -141,6 +144,7 @@ class Config:
     verify_ssl: bool = True
     timeout: int = 300
     embed_batch: int = 64
+    dupcheck_max_memory_mb: int = 2048
     system_prompt: str = ""
     ws: Optional[Workspace] = None
 
